@@ -1,4 +1,5 @@
 export const dynamic = "force-dynamic";
+export const maxDuration = 60;
 import { askLLM, profileText, err } from "../../../lib/llm";
 
 export async function POST(req) {
