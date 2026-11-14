@@ -3,6 +3,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useAura } from "../../lib/store";
 import { AppHeader, Loading } from "../../components/ui";
+import { readJSON } from "../../lib/api";
 
 export default function Track() {
   const [s] = useAura();
@@ -17,8 +18,8 @@ export default function Track() {
     e.preventDefault(); setBusy(true); setError(""); setData(null);
     try {
       const r = await fetch(`/api/stats?url=${encodeURIComponent(url)}`);
-      const d = await r.json();
-      if (!r.ok) throw new Error(d.error);
+      const d = await readJSON(r);
+      if (!r.ok || d.error) throw new Error(d.error);
       setData(d);
     } catch (err) { setError(err.message || "Something went wrong"); } finally { setBusy(false); }
   };

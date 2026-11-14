@@ -3,6 +3,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useAura, levelOf, levelInfo, avatarSrc } from "../../lib/store";
 import { AppHeader, Loading } from "../../components/ui";
+import { readJSON } from "../../lib/api";
 
 const STARTERS = ["Give me 3 Reels ideas for this week", "How do I stop feeling cringe on camera?", "Rewrite my bio so clients understand what I do"];
 
@@ -23,8 +24,8 @@ export default function Coach() {
     try {
       const progress = `Level ${levelOf(s)} (${levelInfo(levelOf(s)).name}), ${Object.keys(s.completed).length} lessons done, ${s.lives} lives.`;
       const r = await fetch("/api/coach", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ messages: next, profile: s.profile, progress }) });
-      const d = await r.json();
-      if (!r.ok) throw new Error(d.error);
+      const d = await readJSON(r);
+      if (!r.ok || d.error) throw new Error(d.error);
       setMsgs([...next, { role: "coach", text: d.reply }]);
     } catch (e) { setError(e.message || "Something went wrong"); } finally { setBusy(false); }
   };

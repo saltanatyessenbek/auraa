@@ -4,14 +4,15 @@ import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { useAura, lessonOpen, levelOf, levelInfo, avatarSrc, loseLife, touch } from "../../../lib/store";
 import { getLesson, yt, XP_PER_LESSON, PERSONAS } from "../../../lib/content";
+import { readJSON } from "../../../lib/api";
 import { AppHeader, Loading, Lock } from "../../../components/ui";
 
 const STEPS = ["Theory", "Video", "Key points", "Practice", "Simulation", "AI feedback", "Avatar progress"];
 
 async function post(url, body) {
   const r = await fetch(url, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body) });
-  const d = await r.json();
-  if (!r.ok) throw new Error(d.error || "Something went wrong");
+  const d = await readJSON(r);
+  if (!r.ok || d.error) throw new Error(d.error || "Something went wrong");
   return d;
 }
 
