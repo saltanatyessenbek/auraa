@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { useAura, lessonOpen, levelOf, levelInfo, avatarSrc, loseLife, touch } from "../../../lib/store";
-import { getLesson, yt, XP_PER_LESSON, PERSONAS } from "../../../lib/content";
+import { getLesson, yt, XP_PER_LESSON, PERSONAS, ALL_LESSONS } from "../../../lib/content";
 import { readJSON } from "../../../lib/api";
 import { AppHeader, Loading, Lock } from "../../../components/ui";
 
@@ -16,8 +16,13 @@ async function post(url, body) {
   return d;
 }
 
+// key={id}: a fresh lesson screen (step, answers, video) for every lesson, even on client-side navigation.
 export default function LessonPage() {
   const { id } = useParams();
+  return <LessonScreen key={id} id={id} />;
+}
+
+function LessonScreen({ id }) {
   const router = useRouter();
   const lesson = getLesson(id);
   const [s, update] = useAura();
@@ -31,6 +36,7 @@ export default function LessonPage() {
   const [reply, setReply] = useState("");
   const [defense, setDefense] = useState(null);
   const [lvlBefore, setLvlBefore] = useState(null);
+  const [video, setVideo] = useState(null);
 
   useEffect(() => {
     if (!s) return;
@@ -38,6 +44,16 @@ export default function LessonPage() {
     else if (s.lives === 0) router.replace("/rest");
     else if (!Object.keys(answers).length && s.answers[id]) setAnswers(s.answers[id]);
   }, [s]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => {
+    if (step === 1 && lesson && video?.for !== lesson.id) {
+      const lid = lesson.id;
+      setVideo(null);
+      fetch(`/api/video?q=${encodeURIComponent(lesson.video)}`).then(readJSON)
+        .then((d) => setVideo({ ...d, for: lid }))
+        .catch(() => setVideo({ error: true, for: lid }));
+    }
+  }, [step, lesson?.id]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     if (step === 4 && lesson?.block === 2 && s?.profile && !feed.length) {
@@ -48,7 +64,7 @@ export default function LessonPage() {
   if (!lesson) return <div className="wrap"><div className="card col"><h2>Lesson not found</h2><Link className="btn" href="/course" style={{ alignSelf: "flex-start" }}>Back to course</Link></div></div>;
   if (!s || !s.profile || !s.avatar || s.lives === 0) return <Loading />;
   if (!lessonOpen(s, id)) return (
-    <div className="wrap"><AppHeader s={s} /><div className="card col"><Lock /><h2>This lesson is locked</h2><p className="muted">Finish the lessons before it first.</p><Link className="btn" href="/course" style={{ alignSelf: "flex-start" }}>Back to course</Link></div></div>
+    <div className="wrap"><AppHeader s={s} /><div className="card col"><Lock /><h2>This lesson is locked</h2><p className="muted">Finish the lessons before it first, or open every block at once with Pro.</p><div className="row" style={{ gap: 10 }}><Link className="btn" href="/course">Back to course</Link><Link className="btn white" href="/pro">See Pro</Link></div></div></div>
   );
 
   const result = s.results[id];
@@ -91,7 +107,7 @@ export default function LessonPage() {
   };
 
   const nextAfter = () => {
-    const all = ["1-1", "1-2", "1-3", "1-4", "2-1", "2-2", "2-3", "2-4"];
+    const all = ALL_LESSONS.map((l) => l.id);
     const n = all[all.indexOf(id) + 1];
     return n && lessonOpen(s, n) ? `/lesson/${n}` : "/course";
   };
@@ -135,12 +151,21 @@ export default function LessonPage() {
 
           {step === 1 && (<>
             <span className="pill">Step 2 · Video</span>
-            <h1 className="big">Watch a short video on this</h1>
-            <p className="muted">Pick any video from the YouTube results. Come back when you're done.</p>
-            <a className="card dark row" href={yt(lesson.video)} target="_blank" rel="noopener noreferrer" style={{ textDecoration: "none", gap: 16 }}>
-              <span className="badge" style={{ background: "var(--hot)", width: 56, height: 56 }}><svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5l11 7-11 7z" fill="#fff" /></svg></span>
-              <div><strong>Open on YouTube: “{lesson.video}”</strong><div className="small" style={{ color: "#D9D6E8" }}>Opens in a new tab</div></div>
-            </a>
+            <h1 className="big">Watch: {lesson.title}</h1>
+            {video?.for !== lesson.id && <div className="card" style={{ background: "var(--soft)" }}>Finding the most-watched video on this topic…</div>}
+            {video?.for === lesson.id && video.id && (<>
+              <div style={{ position: "relative", width: "100%", paddingTop: "56.25%", borderRadius: 18, overflow: "hidden", background: "#000" }}>
+                <iframe src={`https://www.youtube-nocookie.com/embed/${video.id}`} title={video.title} allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen
+                  style={{ position: "absolute", inset: 0, width: "100%", height: "100%", border: 0 }} />
+              </div>
+              <p className="small muted"><strong>{video.title}</strong> · {video.channel} · {Number(video.views || 0).toLocaleString("en-US")} views · {Number(video.likes || 0).toLocaleString("en-US")} likes. Picked live from YouTube: the most-viewed of the top results for this topic.</p>
+            </>)}
+            {video?.for === lesson.id && !video.id && (
+              <a className="card dark row" href={yt(lesson.video)} target="_blank" rel="noopener noreferrer" style={{ textDecoration: "none", gap: 16 }}>
+                <span className="badge" style={{ background: "var(--hot)", width: 56, height: 56 }}><svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5l11 7-11 7z" fill="#fff" /></svg></span>
+                <div><strong>Open on YouTube: “{lesson.video}”</strong><div className="small" style={{ color: "#D9D6E8" }}>Opens in a new tab</div></div>
+              </a>
+            )}
             <button type="button" className="btn" style={{ alignSelf: "flex-end" }} onClick={() => setStep(2)}>I watched it</button>
           </>)}
 
@@ -254,7 +279,7 @@ export default function LessonPage() {
               <img src={avatarSrc(s)} alt="Your avatar" style={{ width: 220, borderRadius: 24 }} />
               <div className="col">
                 <p><strong>You got:</strong> {lesson.result}</p>
-                <p>{lesson.stat === "hook" ? "Hook power" : lesson.stat === "clarity" ? "Clarity" : lesson.stat === "audience" ? "Audience insight" : "Storytelling"} +1</p>
+                <p>{({ hook: "Hook power", clarity: "Clarity", audience: "Audience insight", story: "Storytelling", trust: "Trust" })[lesson.stat]} +1</p>
                 <p>Total: {s.xp} XP · {s.streak}-day streak</p>
               </div>
             </div>

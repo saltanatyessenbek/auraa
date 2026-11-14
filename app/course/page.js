@@ -30,7 +30,7 @@ export default function Course() {
           <span className="pill" style={{ background: "rgba(255,255,255,.18)", color: "#fff" }}>{s.avatar.name}</span>
           <img className="avatar" src={avatarSrc(s)} alt={`Your avatar at ${info.name}`} />
           <div className="row" style={{ justifyContent: "space-between" }}><h2>{info.name}</h2><span className="small">Level {lvl} of 7</span></div>
-          <p className="small">{lvl < 7 ? `Finish block ${lvl} to become ${LEVELS[lvl].name}` : "Top level reached"}</p>
+          <p className="small">{lvl < 7 ? `Finish one more block to become ${LEVELS[lvl].name}` : "Top level reached"}</p>
           <div className="card grid" style={{ color: "#121212", padding: 16, gridTemplateColumns: "1fr 1fr", gap: 10 }}>
             {[["hook", "Hook power"], ["clarity", "Clarity"], ["audience", "Audience insight"], ["story", "Storytelling"], ["trust", "Trust"]].map(([k, n]) => (
               <div key={k}><div style={{ fontFamily: "Inter Tight", fontWeight: 800, fontSize: 22 }}>{s.stats[k]}</div><span className="small">{n}</span></div>
@@ -41,7 +41,7 @@ export default function Course() {
         <main className="card col">
           <span className="pill">Your course · {s.profile.niche}</span>
           <h1 style={{ fontSize: 36 }}>7 blocks to your first clients</h1>
-          <p className="muted small">{done} lessons done. Each block opens at its avatar level.</p>
+          <p className="muted small">{done} of 24 lessons done. Every finished block levels up your avatar.</p>
           {BLOCKS.map((b) => {
             const st = blockStatus(s, b);
             const open = st === "open";
@@ -55,12 +55,10 @@ export default function Course() {
                     <div className="small muted">
                       {st === "done" && "Done"}
                       {open && b.goal}
-                      {st === "locked" && `Opens at ${LEVELS[b.id - 1].name} · ${b.soon ? b.soon.join(", ") : b.lessons.map((l) => l.title).join(", ")}`}
-                      {st === "pro" && "Unlocked by level. Needs Pro."}
-                      {st === "soon" && `Lessons coming in the next release: ${b.soon.join(", ")}`}
+                      {st === "locked" && `Finish block ${b.id - 1} to open · ${b.lessons.map((l) => l.title).join(", ")}`}
+                      {st === "soon" && "Coming soon"}
                     </div>
                   </div>
-                  {st === "pro" && <Link className="btn" href="/pro" style={{ padding: "8px 14px", fontSize: 13 }}>Go Pro</Link>}
                 </div>
                 {(open || st === "done") && b.lessons.length > 0 && (
                   <div className="grid" style={{ gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))", gap: 8 }}>
@@ -93,9 +91,9 @@ export default function Course() {
             </div>
           ) : (
             <div className="card pinkbg col">
-              <h2 style={{ fontSize: 26 }}>All open lessons done</h2>
-              <p>{s.pro ? "New blocks arrive in the next release." : "Go Pro to unlock block 3 and beyond."}</p>
-              <Link className="btn" href={s.pro ? "/track" : "/pro"}>{s.pro ? "Track a real Short" : "See Pro"}</Link>
+              <h2 style={{ fontSize: 26 }}>All 24 lessons done</h2>
+              <p>You finished every lesson. Time to launch for real!</p>
+              <Link className="btn" href="/track">Track a real Short</Link>
             </div>
           )}
           <div className="card col">

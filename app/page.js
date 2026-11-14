@@ -126,13 +126,13 @@ export default function Landing() {
           <div className="col" style={{ background: "var(--soft)", borderRadius: 22, padding: 28 }}>
             <strong>Free</strong>
             <span style={{ fontFamily: "Inter Tight", fontWeight: 800, fontSize: 44 }}>$0</span>
-            <p>Quiz, avatar, blocks 1–2, 3 lives.</p>
+            <p>Quiz, avatar, all 7 blocks step by step, 3 lives.</p>
             <Link className="btn white" href={start}>Start free</Link>
           </div>
           <div className="col dark" style={{ borderRadius: 22, padding: 28 }}>
             <strong style={{ color: "#FFD43B" }}>Pro</strong>
             <span style={{ fontFamily: "Inter Tight", fontWeight: 800, fontSize: 44 }}>$12<span style={{ fontSize: 18 }}>/mo</span></span>
-            <p>All 7 blocks, unlimited AI coach, life refills.</p>
+            <p>All blocks open at once, unlimited AI coach, life refills.</p>
             <Link className="btn yellow" href="/pro">See Pro</Link>
           </div>
           <div className="col" style={{ background: "var(--soft)", borderRadius: 22, padding: 28 }}>

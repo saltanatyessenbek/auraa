@@ -15,7 +15,7 @@ export default function Pro() {
           <span className="pill" style={{ background: "#FFD43B", color: "#121212" }}>Aura Pro</span>
           <h1 className="big">$12 / month</h1>
           <ul className="col" style={{ margin: 0, paddingLeft: 20, gap: 8, fontSize: 17 }}>
-            <li>All 7 blocks, from Video Production to Real Launch</li>
+            <li>All 7 blocks open at once: skip ahead to any topic</li>
             <li>Unlimited AI coach</li>
             <li>Life refills and streak freezes</li>
             <li>Tracking for your real Shorts</li>
