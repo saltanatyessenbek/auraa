@@ -32,7 +32,7 @@ export default function AvatarPage() {
           <span className="pill">Your avatar</span>
           <h1 className="big">Pick the one that feels like you</h1>
           <p className="muted">It levels up with every task you pass. At 0 lives it falls asleep.</p>
-          <div className="grid g3">
+          <div className="grid" style={{ gridTemplateColumns: "repeat(3, minmax(0, 1fr))" }}>
             {CHARACTERS.map((c) => (
               <button key={c.id} type="button" aria-pressed={char === c.id} onClick={() => setChar(c.id)}
                 style={{ border: `4px solid ${char === c.id ? "#5A3CF0" : "transparent"}`, background: "#fff", borderRadius: 24, padding: 0, overflow: "hidden", cursor: "pointer", font: "inherit" }}>

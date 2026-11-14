@@ -23,8 +23,8 @@ npm run dev                  # http://localhost:3000
 ## Environment variables
 | Name | Needed for |
 |---|---|
-| `ANTHROPIC_API_KEY` or `OPENAI_API_KEY` | All AI features (one is enough) |
-| `ANTHROPIC_MODEL` / `OPENAI_MODEL` | Optional model override |
+| `GEMINI_API_KEY` (free tier) or `ANTHROPIC_API_KEY` or `OPENAI_API_KEY` | All AI features (one is enough) |
+| `GEMINI_MODEL` / `ANTHROPIC_MODEL` / `OPENAI_MODEL` | Optional model override |
 | `YOUTUBE_API_KEY` | Real Shorts feed and "Track a Short" |
 
 ## Deploy (Vercel)
